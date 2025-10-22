@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Load {
+  id                Int      @id @default(autoincrement())
+  load_id           String   @unique
+  origin            String
+  destination       String
+  pickup_datetime   DateTime
+  delivery_datetime DateTime
+  equipment_type    String
+  loadboard_rate    Float
+  notes             String?
+  weight            Float
+  commodity_type    String
+  num_of_pieces     Int
+  miles             Float
+  dimensions        String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relationship to call records
+  call_records CallRecord[]
+}
+
+model CallRecord {
+  id               Int      @id @default(autoincrement())
+  call_id          String   @unique
+  mc_number        String
+  carrier_name     String?
+  transcript       String?  @db.Text
+  classification   String? // outcome: booked, rejected, pending
+  sentiment        String? // positive, neutral, negative
+  negotiated_price Float?
+  loadboard_rate   Float?
+  load_id          String?
+  duration         Int? // in seconds
+  timestamp        DateTime @default(now())
+  extracted_data   Json? // flexible field for any additional data
+
+  // Relationship to loads
+  load Load? @relation(fields: [load_id], references: [load_id])
+}
