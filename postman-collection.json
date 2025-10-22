@@ -1,0 +1,175 @@
+{
+  "info": {
+    "name": "HappyRobot Carrier Sales API",
+    "description": "API collection for testing HappyRobot Carrier Sales endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Search Loads - Chicago",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"origin\": \"Chicago\",\n  \"equipment_type\": \"Dry Van\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/loads/search",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "loads", "search"]
+        }
+      }
+    },
+    {
+      "name": "Search Loads - All",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/loads/search",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "loads", "search"]
+        }
+      }
+    },
+    {
+      "name": "Verify MC - Schneider",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mc_number\": \"172379\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/fmcsa/verify",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "fmcsa", "verify"]
+        }
+      }
+    },
+    {
+      "name": "Verify MC - J.B. Hunt",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mc_number\": \"109520\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/fmcsa/verify",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "fmcsa", "verify"]
+        }
+      }
+    },
+    {
+      "name": "Record Call - Successful Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"call_id\": \"call-001\",\n  \"mc_number\": \"172379\",\n  \"carrier_name\": \"Schneider National\",\n  \"transcript\": \"Carrier called asking about loads from Chicago to Dallas. Negotiated price from $2400 to $2500. Booked successfully.\",\n  \"classification\": \"booked\",\n  \"sentiment\": \"positive\",\n  \"negotiated_price\": 2500,\n  \"loadboard_rate\": 2400,\n  \"load_id\": \"LD-2025-001\",\n  \"duration\": 180,\n  \"extracted_data\": {\n    \"negotiation_rounds\": 2,\n    \"final_price\": 2500,\n    \"carrier_satisfaction\": \"high\"\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/calls/record",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "calls", "record"]
+        }
+      }
+    },
+    {
+      "name": "Record Call - Rejected",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"call_id\": \"call-002\",\n  \"mc_number\": \"999999999\",\n  \"carrier_name\": \"Invalid Carrier\",\n  \"transcript\": \"Carrier called but MC number was invalid. Call ended.\",\n  \"classification\": \"failed_verification\",\n  \"sentiment\": \"negative\",\n  \"duration\": 45\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/calls/record",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "calls", "record"]
+        }
+      }
+    },
+    {
+      "name": "Get Metrics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/metrics",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "metrics"]
+        }
+      }
+    }
+  ]
+}

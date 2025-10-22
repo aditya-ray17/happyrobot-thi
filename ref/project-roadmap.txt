@@ -1,0 +1,193 @@
+# HappyRobot Inbound Carrier Sales - Project Roadmap
+
+## ✅ Completed
+- [x] PostgreSQL database setup via Homebrew
+- [x] Prisma ORM configuration
+- [x] Database schema with `Load` and `CallRecord` models
+- [x] Seed script with 15 diverse freight loads
+- [x] FMCSA API integration tested in Postman
+- [x] HappyRobot platform - MC verification tool configured
+- [x] GitHub repository initialized
+
+## 🚧 Next Steps
+
+### Priority 1: Backend API (Node.js + TypeScript + Express)
+
+**Setup:**
+```bash
+npm install express cors dotenv
+npm install -D @types/express @types/node @types/cors typescript ts-node nodemon
+npx tsc --init
+```
+
+**Create these endpoints:**
+
+1. **POST /api/loads/search**
+   - Accept optional filters: origin, destination, equipment_type, pickup_after, pickup_before
+   - Query PostgreSQL via Prisma
+   - Return matching loads as JSON
+   - HappyRobot agent will call this during calls
+
+2. **POST /api/fmcsa/verify**
+   - Accept: `{ mc_number: string }`
+   - Call FMCSA API: `https://mobile.fmcsa.dot.gov/qc/services/carriers/docket-number/:mc_number?webKey=YOUR_KEY`
+   - Check `allowedToOperate === "Y"`
+   - Return: `{ eligible: boolean, carrier_name: string, reason?: string }`
+
+3. **POST /api/calls/record**
+   - Webhook endpoint for HappyRobot post-call data
+   - Accept: transcript, classification, extracted_data, sentiment
+   - Store in `call_records` table via Prisma
+   - Return success confirmation
+
+4. **GET /api/metrics**
+   - Query `call_records` and `loads` tables
+   - Return aggregated metrics:
+     - Total calls, successful bookings, conversion rate
+     - Average call duration, sentiment distribution
+     - Counter-offer rate, negotiation rounds
+     - Most popular routes/equipment types
+
+**Files to create:**
+```
+src/
+  ├── index.ts              # Express server setup
+  ├── routes/
+  │   ├── loads.ts          # Search endpoint
+  │   ├── fmcsa.ts          # Verification endpoint
+  │   ├── calls.ts          # Record webhook endpoint
+  │   └── metrics.ts        # Dashboard data endpoint
+  ├── services/
+  │   ├── prisma.ts         # Prisma client instance
+  │   └── fmcsa.service.ts  # FMCSA API logic
+  └── types/
+      └── index.ts          # TypeScript interfaces
+```
+
+**Environment variables needed:**
+```
+DATABASE_URL="postgresql://carrier_user:carrier_password_123@localhost:5432/carrier_sales?schema=public"
+FMCSA_API_KEY="cdc33e44d693a3a58451898d4ec9df862c65b954"
+PORT=3000
+```
+
+### Priority 2: HappyRobot Agent Configuration
+
+**In HappyRobot platform:**
+
+1. **Create Inbound Voice Agent**
+   - Add "Verify Carrier" tool → calls `/api/fmcsa/verify`
+   - Add "Search Loads" tool → calls `/api/loads/search`
+   - Add "Transfer to Sales" tool → transfers call
+
+2. **Agent Prompt Structure:**
+   - Root module: Greet caller, ask for MC number
+   - After verification: Ask for load preferences (origin, destination, equipment)
+   - Pitch matching loads with details
+   - Handle negotiation (up to 3 rounds)
+   - Transfer if price agreed
+
+3. **Post-Call Actions:**
+   - AI Classify: outcome (booked, rejected, pending, failed_verification)
+   - AI Extract: mc_number, negotiated_price, load_id, carrier_sentiment
+   - AI Classify: sentiment (positive, neutral, negative)
+   - POST Webhook → `/api/calls/record` with all extracted data
+
+4. **Testing:**
+   - Use web call trigger feature (no phone number needed)
+   - Test with valid MC numbers: 172379, 109520, 138450
+
+### Priority 3: React Dashboard (TypeScript)
+
+**Setup:**
+```bash
+npx create-react-app dashboard --template typescript
+cd dashboard
+npm install axios recharts
+```
+
+**Dashboard features:**
+- Call volume over time (line chart)
+- Conversion funnel (calls → verified → pitched → negotiated → booked)
+- Sentiment distribution (pie chart)
+- Top performing routes
+- Average negotiation metrics
+- Recent calls table with outcomes
+
+**Fetch data from:** `GET /api/metrics`
+
+### Priority 4: Docker & Deployment
+
+**Create Dockerfile:**
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npx prisma generate
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+**Create docker-compose.yml:**
+- PostgreSQL service
+- API service
+- Link them together
+
+**Deploy to:**
+- Fly.io, Railway, or AWS
+- Ensure HTTPS with Let's Encrypt
+- Add API key authentication to endpoints
+
+### Priority 5: Documentation & Deliverables
+
+**Create:**
+1. **README.md** - Setup instructions, architecture overview
+2. **BUILD_DESCRIPTION.md** - Technical implementation details for freight broker
+3. **Email to Carlos Becker** - Progress update with demo video link
+4. **5-minute demo video:**
+   - Use case setup walkthrough
+   - Live demo of agent handling carrier call
+   - Dashboard showing metrics
+   - Code walkthrough of key components
+
+## Tech Stack Summary
+- **Backend:** Node.js + TypeScript + Express + Prisma
+- **Database:** PostgreSQL
+- **Frontend:** React + TypeScript
+- **Voice:** HappyRobot Platform
+- **Deployment:** Docker + Cloud Provider
+- **External APIs:** FMCSA for carrier verification
+
+## Test MC Numbers for Demo
+- 172379 (Schneider National)
+- 109520 (J.B. Hunt)
+- 138450 (Swift Transportation)
+- 999999999 (Invalid - for testing rejection)
+
+## Key Metrics to Track
+- Total calls received
+- MC verification success rate
+- Calls pitched with loads
+- Negotiation engagement rate
+- Successful bookings (transferred to sales)
+- Average negotiation rounds
+- Sentiment distribution
+- Most requested routes/equipment types
+- Average price variance (loadboard vs negotiated)
+
+## Deadline
+**October 24 EOD** - All deliverables submitted
+
+## Questions to Ask Claude Later
+- How to structure negotiation logic in HappyRobot prompts
+- Best practices for error handling in voice agents
+- Dashboard visualization recommendations
+- Deployment troubleshooting
+
+---
+
+**Current Status:** Database seeded, ready to build API endpoints
+**Next Action:** Set up Express + TypeScript backend with /api/loads/search endpoint
