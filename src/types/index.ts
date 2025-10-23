@@ -32,15 +32,6 @@ export interface Load {
   updated_at: Date;
 }
 
-export interface FMCSAVerifyRequest {
-  mc_number: string;
-}
-
-export interface FMCSAVerifyResponse {
-  eligible: boolean;
-  carrier_name: string;
-  reason?: string;
-}
 
 export interface CallRecordRequest {
   call_id: string;

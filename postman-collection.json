@@ -66,52 +66,6 @@
       }
     },
     {
-      "name": "Verify MC - Schneider",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"mc_number\": \"172379\"\n}"
-        },
-        "url": {
-          "raw": "http://localhost:3000/api/fmcsa/verify",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["api", "fmcsa", "verify"]
-        }
-      }
-    },
-    {
-      "name": "Verify MC - J.B. Hunt",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"mc_number\": \"109520\"\n}"
-        },
-        "url": {
-          "raw": "http://localhost:3000/api/fmcsa/verify",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
-          "path": ["api", "fmcsa", "verify"]
-        }
-      }
-    },
-    {
       "name": "Record Call - Successful Booking",
       "request": {
         "method": "POST",

@@ -34,20 +34,9 @@ else
     echo -e "${RED}❌ Load search failed (HTTP $response)${NC}"
 fi
 
-# Test 3: MC Verification
-echo -e "\n${YELLOW}3. Testing MC Verification${NC}"
-response=$(curl -s -w "%{http_code}" -o /tmp/fmcsa.json -X POST http://localhost:3000/api/fmcsa/verify \
-  -H "Content-Type: application/json" \
-  -d '{"mc_number": "172379"}')
-if [ "$response" = "200" ]; then
-    echo -e "${GREEN}✅ MC verification passed${NC}"
-    cat /tmp/fmcsa.json
-else
-    echo -e "${RED}❌ MC verification failed (HTTP $response)${NC}"
-fi
 
-# Test 4: Call Recording
-echo -e "\n${YELLOW}4. Testing Call Recording${NC}"
+# Test 3: Call Recording
+echo -e "\n${YELLOW}3. Testing Call Recording${NC}"
 response=$(curl -s -w "%{http_code}" -o /tmp/call.json -X POST http://localhost:3000/api/calls/record \
   -H "Content-Type: application/json" \
   -d '{"call_id": "test-'$(date +%s)'", "mc_number": "172379", "carrier_name": "Test Carrier", "classification": "booked", "sentiment": "positive"}')
@@ -58,8 +47,8 @@ else
     echo -e "${RED}❌ Call recording failed (HTTP $response)${NC}"
 fi
 
-# Test 5: Metrics
-echo -e "\n${YELLOW}5. Testing Metrics${NC}"
+# Test 4: Metrics
+echo -e "\n${YELLOW}4. Testing Metrics${NC}"
 response=$(curl -s -w "%{http_code}" -o /tmp/metrics.json http://localhost:3000/api/metrics)
 if [ "$response" = "200" ]; then
     echo -e "${GREEN}✅ Metrics retrieval passed${NC}"
@@ -68,9 +57,9 @@ else
     echo -e "${RED}❌ Metrics retrieval failed (HTTP $response)${NC}"
 fi
 
-# Test 6: Error Handling
-echo -e "\n${YELLOW}6. Testing Error Handling${NC}"
-response=$(curl -s -w "%{http_code}" -o /tmp/error.json -X POST http://localhost:3000/api/fmcsa/verify \
+# Test 5: Error Handling
+echo -e "\n${YELLOW}5. Testing Error Handling${NC}"
+response=$(curl -s -w "%{http_code}" -o /tmp/error.json -X POST http://localhost:3000/api/calls/record \
   -H "Content-Type: application/json" \
   -d '{}')
 if [ "$response" = "400" ]; then
@@ -86,4 +75,4 @@ echo -e "Check the responses above to verify all endpoints are working."
 echo -e "================================================"
 
 # Cleanup
-rm -f /tmp/health.json /tmp/loads.json /tmp/fmcsa.json /tmp/call.json /tmp/metrics.json /tmp/error.json
+rm -f /tmp/health.json /tmp/loads.json /tmp/call.json /tmp/metrics.json /tmp/error.json

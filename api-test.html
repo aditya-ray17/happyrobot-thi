@@ -41,14 +41,7 @@
             </div>
 
             <div class="test-section">
-                <h3>3. MC Verification</h3>
-                <input type="text" id="mc-number" placeholder="MC Number" value="172379">
-                <button onclick="testMCVerification()">Verify MC</button>
-                <div id="fmcsa-response" class="response"></div>
-            </div>
-
-            <div class="test-section">
-                <h3>4. Call Recording</h3>
+                <h3>3. Call Recording</h3>
                 <input type="text" id="call-id" placeholder="Call ID" value="web-test-001">
                 <input type="text" id="call-mc" placeholder="MC Number" value="172379">
                 <input type="text" id="carrier-name" placeholder="Carrier Name" value="Test Carrier">
@@ -68,13 +61,13 @@
             </div>
 
             <div class="test-section">
-                <h3>5. Metrics Dashboard</h3>
+                <h3>4. Metrics Dashboard</h3>
                 <button onclick="testMetrics()">Get Metrics</button>
                 <div id="metrics-response" class="response"></div>
             </div>
 
             <div class="test-section">
-                <h3>6. Test All Endpoints</h3>
+                <h3>5. Test All Endpoints</h3>
                 <button onclick="testAll()" style="background: #28a745;">Run All Tests</button>
                 <div id="all-tests-response" class="response"></div>
             </div>
@@ -86,6 +79,7 @@
         
         async function makeRequest(url, options = {}) {
             try {
+                console.log('Making request to:', url);
                 const response = await fetch(url, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -93,9 +87,11 @@
                     },
                     ...options
                 });
+                console.log('Response status:', response.status);
                 const data = await response.json();
                 return { success: response.ok, data, status: response.status };
             } catch (error) {
+                console.error('Request failed:', error);
                 return { success: false, data: { error: error.message }, status: 0 };
             }
         }
@@ -130,14 +126,6 @@
             displayResponse('loads-response', result);
         }
 
-        async function testMCVerification() {
-            const mcNumber = document.getElementById('mc-number').value;
-            const result = await makeRequest(`${API_BASE}/api/fmcsa/verify`, {
-                method: 'POST',
-                body: JSON.stringify({ mc_number: mcNumber })
-            });
-            displayResponse('fmcsa-response', result);
-        }
 
         async function testCallRecording() {
             const callData = {
@@ -171,7 +159,6 @@
             const tests = [
                 { name: 'Health Check', fn: testHealth },
                 { name: 'Load Search', fn: testLoadSearch },
-                { name: 'MC Verification', fn: testMCVerification },
                 { name: 'Call Recording', fn: testCallRecording },
                 { name: 'Metrics', fn: testMetrics }
             ];
