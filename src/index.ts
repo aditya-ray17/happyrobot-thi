@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import loadsRouter from './routes/loads';
 import callsRouter from './routes/calls';
 import metricsRouter from './routes/metrics';
-
+import { apiKeyAuth } from './middleware/auth';
 // Load environment variables
 dotenv.config();
 
@@ -15,6 +15,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api', apiKeyAuth);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
