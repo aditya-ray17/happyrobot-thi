@@ -51,11 +51,11 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 HappyRobot Carrier Sales API running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔍 Load search: POST http://localhost:${PORT}/api/loads/search`);
-  console.log(`📞 Call recording: POST http://localhost:${PORT}/api/calls/record`);
-  console.log(`📈 Metrics: GET http://localhost:${PORT}/api/metrics`);
+  console.log(`HappyRobot Carrier Sales API running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`Load search: POST http://localhost:${PORT}/api/loads/search`);
+  console.log(`Call recording: POST http://localhost:${PORT}/api/calls/record`);
+  console.log(`Metrics: GET http://localhost:${PORT}/api/metrics`);
 });
 
 export default app;

@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🌱 Seeding database...');
+    console.log('Seeding database...');
 
     // Clear existing data
     await prisma.callRecord.deleteMany({});
@@ -244,15 +244,11 @@ async function main() {
         });
     }
 
-    console.log('✅ Successfully seeded 15 freight loads!');
-    console.log('📊 Equipment types: Dry Van, Reefer, Flatbed');
-    console.log('🗺️  Routes: Various US interstate corridors');
-    console.log('📅 Pickup dates: Oct 21-29, 2025');
 }
 
 main()
     .catch((e) => {
-        console.error('❌ Seeding failed:', e);
+        console.error('Seeding failed:', e);
         process.exit(1);
     })
     .finally(async () => {
