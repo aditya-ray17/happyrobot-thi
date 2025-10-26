@@ -29,7 +29,6 @@ router.post('/record', async (req: Request, res: Response) => {
       });
     }
     
-    // Create new call record
     const callRecord = await prisma.callRecord.create({
       data: {
         call_id: callData.call_id,
@@ -38,11 +37,12 @@ router.post('/record', async (req: Request, res: Response) => {
         transcript: callData.transcript,
         classification: callData.classification,
         sentiment: callData.sentiment,
-        negotiated_price: callData.negotiated_price,
-        loadboard_rate: callData.loadboard_rate,
+        // Convert strings to numbers
+        negotiated_price: callData.negotiated_price ? parseFloat(String(callData.negotiated_price)) : null,
+        loadboard_rate: callData.loadboard_rate ? parseFloat(String(callData.loadboard_rate)) : null,
         load_id: callData.load_id,
-        duration: callData.duration,
-        negotiation_rounds: callData.negotiation_rounds
+        duration: callData.duration ? parseInt(String(callData.duration)) : null,
+        negotiation_rounds: callData.negotiation_rounds ? parseInt(String(callData.negotiation_rounds)) : null,
       }
     });
     

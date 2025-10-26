@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HappyRobot Carrier Sales Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-label {
+            color: #718096;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            color: #2d3748;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .kpi-unit {
+            color: #718096;
+            font-size: 18px;
+            margin-left: 5px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            color: #2d3748;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .table-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-warning {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Carrier Sales Dashboard</h1>
+            <p class="subtitle">Real-time metrics for inbound carrier sales automation</p>
+        </header>
+
+        <div id="loading" class="loading">Loading dashboard data...</div>
+        <div id="error" style="display: none;"></div>
+        <div id="dashboard" style="display: none;">
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Calls</div>
+                    <div class="kpi-value" id="totalCalls">-</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Successful Bookings</div>
+                    <div class="kpi-value" id="bookings">-</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Conversion Rate</div>
+                    <div class="kpi-value" id="conversionRate">-<span class="kpi-unit">%</span></div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Avg Call Duration</div>
+                    <div class="kpi-value" id="avgDuration">-<span class="kpi-unit">sec</span></div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">Carrier Sentiment Distribution</h3>
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Popular Equipment Types</h3>
+                    <canvas id="equipmentChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card" style="margin-bottom: 30px;">
+                <h3 class="chart-title">Top 10 Routes</h3>
+                <canvas id="routesChart"></canvas>
+            </div>
+
+            <!-- Recent Calls Table -->
+            <div class="table-card">
+                <h3 class="chart-title">Recent Calls</h3>
+                <table id="recentCallsTable">
+                    <thead>
+                        <tr>
+                            <th>Call ID</th>
+                            <th>MC Number</th>
+                            <th>Carrier</th>
+                            <th>Outcome</th>
+                            <th>Sentiment</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'https://happyrobot-thi-production.up.railway.app/api/metrics';
+        const API_KEY = 'hrcs_7k9mP2xQwL5nR8vJ4tY6zF3bN1aS0dG';
+
+        // Fetch metrics data
+        async function fetchMetrics() {
+            try {
+                const response = await fetch(API_URL, {
+                    headers: {
+                        'x-api-key': API_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching metrics:', error);
+                throw error;
+            }
+        }
+
+        // Update KPI cards
+        function updateKPIs(data) {
+            document.getElementById('totalCalls').textContent = data.total_calls;
+            document.getElementById('bookings').textContent = data.successful_bookings;
+            document.getElementById('conversionRate').textContent = data.conversion_rate.toFixed(1);
+            document.getElementById('avgDuration').textContent = data.average_call_duration;
+        }
+
+        // Create sentiment chart
+        function createSentimentChart(data) {
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Positive', 'Neutral', 'Negative'],
+                    datasets: [{
+                        data: [
+                            data.sentiment_distribution.positive,
+                            data.sentiment_distribution.neutral,
+                            data.sentiment_distribution.negative
+                        ],
+                        backgroundColor: ['#48bb78', '#ecc94b', '#f56565']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create equipment chart
+        function createEquipmentChart(data) {
+            const ctx = document.getElementById('equipmentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.popular_equipment.map(e => e.equipment_type),
+                    datasets: [{
+                        data: data.popular_equipment.map(e => e.count),
+                        backgroundColor: ['#667eea', '#764ba2', '#f6ad55', '#fc8181']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create routes chart
+        function createRoutesChart(data) {
+            const ctx = document.getElementById('routesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.popular_routes.map(r => r.route),
+                    datasets: [{
+                        label: 'Number of Loads',
+                        data: data.popular_routes.map(r => r.count),
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Get badge class for classification
+        function getClassificationBadge(classification) {
+            const badges = {
+                'booked': 'badge-success',
+                'rejected': 'badge-danger',
+                'pending': 'badge-warning',
+                'failed_verification': 'badge-danger',
+                'no_match_found': 'badge-info'
+            };
+            return badges[classification] || 'badge-info';
+        }
+
+        // Get badge class for sentiment
+        function getSentimentBadge(sentiment) {
+            const badges = {
+                'positive': 'badge-success',
+                'neutral': 'badge-warning',
+                'negative': 'badge-danger'
+            };
+            return badges[sentiment] || 'badge-info';
+        }
+
+        // Update recent calls table
+        function updateRecentCalls(data) {
+            const tbody = document.querySelector('#recentCallsTable tbody');
+            tbody.innerHTML = '';
+
+            data.recent_calls.forEach(call => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${call.call_id}</td>
+                    <td>${call.mc_number}</td>
+                    <td>${call.carrier_name || 'N/A'}</td>
+                    <td><span class="badge ${getClassificationBadge(call.classification)}">${call.classification || 'N/A'}</span></td>
+                    <td><span class="badge ${getSentimentBadge(call.sentiment)}">${call.sentiment || 'N/A'}</span></td>
+                    <td>${new Date(call.timestamp).toLocaleString()}</td>
+                `;
+            });
+        }
+
+        // Initialize dashboard
+        async function initDashboard() {
+            try {
+                const data = await fetchMetrics();
+                
+                // Hide loading, show dashboard
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+
+                // Update all components
+                updateKPIs(data);
+                createSentimentChart(data);
+                createEquipmentChart(data);
+                createRoutesChart(data);
+                updateRecentCalls(data);
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').className = 'error';
+                document.getElementById('error').textContent = `Error loading dashboard: ${error.message}. Please check your API connection.`;
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        initDashboard();
+        setInterval(initDashboard, 30000);
+    </script>
+</body>
+</html>
