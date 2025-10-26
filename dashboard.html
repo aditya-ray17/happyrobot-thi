@@ -262,6 +262,11 @@
         const API_URL = 'https://happyrobot-thi-production.up.railway.app/api/metrics';
         const API_KEY = 'hrcs_7k9mP2xQwL5nR8vJ4tY6zF3bN1aS0dG';
 
+        // Chart instances for proper cleanup
+        let sentimentChart = null;
+        let equipmentChart = null;
+        let routesChart = null;
+
         // Fetch metrics data
         async function fetchMetrics() {
             try {
@@ -294,7 +299,13 @@
         // Create sentiment chart
         function createSentimentChart(data) {
             const ctx = document.getElementById('sentimentChart').getContext('2d');
-            new Chart(ctx, {
+            
+            // Destroy existing chart if it exists
+            if (sentimentChart) {
+                sentimentChart.destroy();
+            }
+            
+            sentimentChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Positive', 'Neutral', 'Negative'],
@@ -322,7 +333,13 @@
         // Create equipment chart
         function createEquipmentChart(data) {
             const ctx = document.getElementById('equipmentChart').getContext('2d');
-            new Chart(ctx, {
+            
+            // Destroy existing chart if it exists
+            if (equipmentChart) {
+                equipmentChart.destroy();
+            }
+            
+            equipmentChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: data.popular_equipment.map(e => e.equipment_type),
@@ -346,12 +363,18 @@
         // Create routes chart
         function createRoutesChart(data) {
             const ctx = document.getElementById('routesChart').getContext('2d');
-            new Chart(ctx, {
+            
+            // Destroy existing chart if it exists
+            if (routesChart) {
+                routesChart.destroy();
+            }
+            
+            routesChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: data.popular_routes.map(r => r.route),
                     datasets: [{
-                        label: 'Number of Loads',
+                        label: 'Number of Calls',
                         data: data.popular_routes.map(r => r.count),
                         backgroundColor: '#667eea'
                     }]

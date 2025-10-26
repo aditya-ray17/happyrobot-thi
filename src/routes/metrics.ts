@@ -68,46 +68,59 @@ router.get('/', async (req: Request, res: Response) => {
     });
     const counterOfferRate = totalCalls > 0 ? (counterOfferCalls / totalCalls) * 100 : 0;
     
-    // Calculate average negotiation rounds (simplified - based on extracted_data)
-    // For now, we'll use a simplified approach since Prisma JSON queries can be complex
-    const averageNegotiationRounds = 2.5; // Placeholder - would be calculated from actual data
-    
-    // Get popular routes
-    const popularRoutes = await prisma.load.groupBy({
-      by: ['origin', 'destination'],
-      _count: {
-        id: true
+    // Calculate average negotiation rounds
+    const avgNegotiationResult = await prisma.callRecord.aggregate({
+      _avg: {
+        negotiation_rounds: true
       },
-      orderBy: {
-        _count: {
-          id: 'desc'
-        }
-      },
-      take: 10
+      where: {
+        negotiation_rounds: { not: null }
+      }
     });
+    const averageNegotiationRounds = avgNegotiationResult._avg.negotiation_rounds || 0;
     
-    const routes = popularRoutes.map(route => ({
-      route: `${route.origin} → ${route.destination}`,
-      count: route._count.id
-    }));
-    
-    // Get popular equipment types
-    const popularEquipment = await prisma.load.groupBy({
-      by: ['equipment_type'],
-      _count: {
-        id: true
+    // Get popular routes from actual calls (via load relationship)
+    const callsWithLoads = await prisma.callRecord.findMany({
+      where: {
+        load_id: { not: null }
       },
-      orderBy: {
-        _count: {
-          id: 'desc'
+      include: {
+        load: {
+          select: {
+            origin: true,
+            destination: true,
+            equipment_type: true
+          }
         }
       }
     });
     
-    const equipment = popularEquipment.map(eq => ({
-      equipment_type: eq.equipment_type,
-      count: eq._count.id
-    }));
+    // Aggregate routes from calls
+    const routeMap = new Map<string, number>();
+    callsWithLoads.forEach(call => {
+      if (call.load) {
+        const route = `${call.load.origin} → ${call.load.destination}`;
+        routeMap.set(route, (routeMap.get(route) || 0) + 1);
+      }
+    });
+    
+    const routes = Array.from(routeMap.entries())
+      .map(([route, count]) => ({ route, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+    
+    // Aggregate equipment types from calls
+    const equipmentMap = new Map<string, number>();
+    callsWithLoads.forEach(call => {
+      if (call.load?.equipment_type) {
+        const eq = call.load.equipment_type;
+        equipmentMap.set(eq, (equipmentMap.get(eq) || 0) + 1);
+      }
+    });
+    
+    const equipment = Array.from(equipmentMap.entries())
+      .map(([equipment_type, count]) => ({ equipment_type, count }))
+      .sort((a, b) => b.count - a.count);
     
     // Get recent calls
     const recentCalls = await prisma.callRecord.findMany({
