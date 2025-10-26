@@ -41,8 +41,8 @@ model CallRecord {
   loadboard_rate   Float?
   load_id          String?
   duration         Int? // in seconds
+  negotiation_rounds Int?
   timestamp        DateTime @default(now())
-  extracted_data   Json? // flexible field for any additional data
 
   // Relationship to loads
   load Load? @relation(fields: [load_id], references: [load_id])

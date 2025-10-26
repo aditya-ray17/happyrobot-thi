@@ -44,7 +44,7 @@ export interface CallRecordRequest {
   loadboard_rate?: number;
   load_id?: string;
   duration?: number;
-  extracted_data?: any;
+  negotiation_rounds?: number;
 }
 
 export interface CallRecordResponse {

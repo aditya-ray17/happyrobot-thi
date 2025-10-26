@@ -42,7 +42,7 @@ router.post('/record', async (req: Request, res: Response) => {
         loadboard_rate: callData.loadboard_rate,
         load_id: callData.load_id,
         duration: callData.duration,
-        extracted_data: callData.extracted_data
+        negotiation_rounds: callData.negotiation_rounds
       }
     });
     
