@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', apiKeyAuth);
+app.use(apiKeyAuth);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

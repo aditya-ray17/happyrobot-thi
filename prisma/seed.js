@@ -2,13 +2,23 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('Seeding database...');
 
-    // Clear existing data
-    await prisma.callRecord.deleteMany({});
-    await prisma.load.deleteMany({});
+    const existingLoads = await prisma.load.count();
 
-    // Create diverse freight loads
+    if(existingLoads > 0) {
+        console.log('Existing loads found, skipping...');
+        return;
+    }
+
+    const existingCallRecords = await prisma.callRecord.count();
+    
+    if(existingCallRecords > 0) {
+        console.log('Existing call records found, skipping...');
+        return;
+    }
+
+    console.log('Tables empty, seeding database...');
+
     const loads = [
         {
             load_id: 'LD-2025-001',

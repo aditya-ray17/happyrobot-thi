@@ -49,4 +49,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || 8080) + '/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start script that runs migrations, seeds, then starts the app
-CMD sh -c "npx prisma migrate deploy && npm run seed && npm start"
+CMD sh -c "npx prisma migrate deploy && (npm run seed || echo 'No seeding required') && npm start"
