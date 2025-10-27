@@ -41,6 +41,9 @@ RUN npx prisma generate
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy dashboard index.html
+COPY index.html ./index.html
+
 # Expose port (Railway uses PORT env var, default to 8080)
 EXPOSE 8080
 
