@@ -16,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/', dashboardRouter);
 
 app.use(apiKeyAuth);
 
@@ -29,7 +30,6 @@ app.get('/health', (req, res) => {
 });
 
 // Dashboard api key injection route
-app.use('/', dashboardRouter);
 
 // API Routes
 app.use('/api/loads', loadsRouter);
