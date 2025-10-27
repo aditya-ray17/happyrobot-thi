@@ -259,23 +259,25 @@
 
     <script>
         // Configuration
-        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:8080/api/metrics'
-            : 'https://happyrobot-thi-production.up.railway.app/api/metrics';
-
-        const API_KEY = 'hrcs_7k9mP2xQwL5nR8vJ4tY6zF3bN1aS0dG';
+        const API_URL = 'YOUR_API_URL_HERE';
+        const API_KEY = 'YOUR_API_KEY_HERE';
         
         console.log('Using API URL:', API_URL);
 
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isLocal = YOUR_LOCAL_URL_HERE;
+
+        console.log('Environment:', isLocal ? 'LOCAL' : 'PRODUCTION');
 
         // Update the header with environment badge
         window.addEventListener('DOMContentLoaded', () => {
             const header = document.querySelector('h1');
             if (isLocal && header) {
-                header.innerHTML = 'Carrier Sales Dashboard <span style="color: #48bb78; font-size: 20px; font-weight: normal;">[LOCAL]</span>';
+                const badge = document.createElement('span');
+                badge.style.cssText = `background: #c6f6d5; color: #22543d; padding: 4px 12px; border-radius: 20px; font-size: 16px; font-weight: 600; margin-left: 15px;`;
+                badge.textContent = 'LOCAL';
+                header.appendChild(badge);
             }
-        });
+    });
         // Chart instances for proper cleanup
         let sentimentChart = null;
         let equipmentChart = null;

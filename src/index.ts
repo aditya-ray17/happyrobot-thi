@@ -5,6 +5,7 @@ import loadsRouter from './routes/loads';
 import callsRouter from './routes/calls';
 import metricsRouter from './routes/metrics';
 import { apiKeyAuth } from './middleware/auth';
+import dashboardRouter from './routes/dashboard';
 // Load environment variables
 dotenv.config();
 
@@ -27,11 +28,13 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Dashboard api key injection route
+app.use('/', dashboardRouter);
+
 // API Routes
 app.use('/api/loads', loadsRouter);
 app.use('/api/calls', callsRouter);
 app.use('/api/metrics', metricsRouter);
-
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Unhandled error:', err);
